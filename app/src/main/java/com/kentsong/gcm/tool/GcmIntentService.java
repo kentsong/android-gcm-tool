@@ -9,62 +9,53 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.kentsong.gcm.tool.utils.BundleHelper;
+
 public class GcmIntentService extends IntentService {
 
-	private final String TAG = "gcmPush";
+    private final String TAG = "gcmPush";
 
-	public GcmIntentService() {
-		super("GcmIntentService");
-	}
+    public GcmIntentService() {
+        super("GcmIntentService");
+    }
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
-		// TODO Auto-generated method stub
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        // TODO Auto-generated method stub
 
-		Bundle extras = intent.getExtras();
-		Log.d(TAG, extras.toString());
-
-
-//		if (Values.GCM_SENDER_ID.equals(extras.getString("from"))) {
-
-			Log.d(TAG, "GET PUSH");
-			Log.d(TAG, "extras:" + extras);
+        Bundle extras = intent.getExtras();
+        Log.d(TAG, "GET PUSH");
+        Log.d(TAG, BundleHelper.toString(extras));
 
 
+        Intent boardCastIntent = new Intent();
+        boardCastIntent.putExtras(extras);
+        boardCastIntent.setAction("android.intent.action.test");
+        sendBroadcast(boardCastIntent);
+        sendNotification(extras);
 
-//		}
+        GcmBroadcastReceiver.completeWakefulIntent(intent);
+    }
 
-		Intent boardCastIntent = new Intent();
-		boardCastIntent.putExtras(extras);
-		boardCastIntent.setAction("android.intent.action.test");
-		Log.d(TAG, "extras:" + extras.get("message"));
-		sendBroadcast(boardCastIntent);
-		sendNotification(extras);
+    private void sendNotification(Bundle extras) {
+        String text = extras.getString("message");
 
-		GcmBroadcastReceiver.completeWakefulIntent(intent);
-	}
-
-	private void sendNotification(Bundle extras) {
-		String text = extras.getString("message");
-
-		NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
 //		Intent intent = new Intent(this, MainActivity.class);
 //		intent.putExtras(extras);
-//
 //		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_NO_CREATE);
 
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-				.setDefaults(Notification.DEFAULT_ALL)
-				.setAutoCancel(true)
-				.setSmallIcon(R.drawable.common_google_signin_btn_icon_light)
-				.setTicker(this.getResources().getString(R.string.app_name) + ":" + text)
-				.setContentTitle(this.getResources().getString(R.string.app_name))
-				.setContentText(text);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_light)
+                .setTicker(this.getResources().getString(R.string.app_name) + ":" + text)
+                .setContentTitle(this.getResources().getString(R.string.app_name))
+                .setContentText(text);
 //				.setContentIntent(contentIntent);
-		mNotificationManager.notify("", 0, mBuilder.build());
-	}
-
+        mNotificationManager.notify("", 0, mBuilder.build());
+    }
 
 
 }

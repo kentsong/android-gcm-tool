@@ -16,8 +16,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.kentsong.gcm.tool.utils.BundleHelper;
 
 import org.joda.time.LocalDateTime;
 
@@ -28,7 +30,6 @@ import java.util.Set;
 public class MainActivity extends Activity {
 
     private final String TAG = "MainActivity";
-    private GoogleCloudMessaging gcm;
     private EditText edit_senderId;
     private TextView tv_pushToken;
     private TextView tv_log;
@@ -49,7 +50,7 @@ public class MainActivity extends Activity {
         init();
     }
 
-    private void init(){
+    private void init() {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         //註冊廣播接收器
@@ -67,12 +68,13 @@ public class MainActivity extends Activity {
      * (http://www.buzzingandroid.com/tools/android-layout-finder)
      */
     private void findViews() {
-        edit_senderId = (EditText)findViewById( R.id.edit_sender_id );
-        tv_pushToken = (TextView)findViewById( R.id.tv_push_token );
-        btn_getPushToken = (Button)findViewById( R.id.btn_getPushToken);
-        btn_mailTo = (Button)findViewById( R.id.btn_mailTo);
-        btn_clean = (Button)findViewById( R.id.btn_clean);
-        tv_log = (TextView)findViewById( R.id.tv_log );
+        edit_senderId = (EditText) findViewById(R.id.edit_sender_id);
+        tv_pushToken = (TextView) findViewById(R.id.tv_push_token);
+        tv_log = (TextView) findViewById(R.id.tv_log);
+        btn_getPushToken = (Button) findViewById(R.id.btn_getPushToken);
+        btn_mailTo = (Button) findViewById(R.id.btn_mailTo);
+        btn_clean = (Button) findViewById(R.id.btn_clean);
+
 
         btn_getPushToken.setOnClickListener(btnListener);
         btn_mailTo.setOnClickListener(btnListener);
@@ -83,14 +85,14 @@ public class MainActivity extends Activity {
     }
 
 
-
-    public Button.OnClickListener btnListener = new Button.OnClickListener(){
+    public Button.OnClickListener btnListener = new Button.OnClickListener() {
         @Override
         public void onClick(View v) {
+
             if (v.getId() == R.id.btn_getPushToken) {
                 senderID = edit_senderId.getText().toString();
                 getGCM_PUSH_ID();
-            } else if(v.getId() == R.id.btn_mailTo){
+            } else if (v.getId() == R.id.btn_mailTo) {
 
                 /* Create the Intent */
                 Intent emailIntent = new Intent(Intent.ACTION_SEND);
@@ -103,10 +105,10 @@ public class MainActivity extends Activity {
                 /* Send it */
                 startActivity(emailIntent);
 
-            } else if(v.getId() == R.id.btn_clean){
+            } else if (v.getId() == R.id.btn_clean) {
                 tv_log.setText("");
-//                Intent intent = getPackageManager().getLaunchIntentForPackage("com.chbank.guard");
-//                startActivity(intent);
+//              Intent intent = getPackageManager().getLaunchIntentForPackage("com.chbank.guard");
+//              startActivity(intent);
             }
 
         }
@@ -129,9 +131,11 @@ public class MainActivity extends Activity {
                 try {
                     String token = instanceID.getToken(senderID,
                             GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                    if(token != null && !token.equals("")){
+                    if (token != null && !token.equals("")) {
                         pushID = token;
                         Log.d("token", token);
+                        //訂閱主題"/topics/foo-bar"
+                        subscribeTopics(pushID);
                         return true;
                     }
 
@@ -152,24 +156,16 @@ public class MainActivity extends Activity {
 
     }
 
-    public class MyReceiver extends BroadcastReceiver{
+    private void subscribeTopics(String token) throws IOException {
+        GcmPubSub pubSub = GcmPubSub.getInstance(this);
+        pubSub.subscribe(token, "/topics/foo-bar", null);
+    }
+
+    public class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            StringBuffer sb = new StringBuffer();
-            sb.append(LocalDateTime.now().toString("yyyy/MM/dd HH:mm:ss")+"\n");
-            sb.append("{\n");
-
             Bundle bundle = intent.getExtras();
-            Iterator<String> it = bundle.keySet().iterator();
-            while(it.hasNext()){
-                String key = it.next();
-                Log.d(TAG, key+"="+bundle.get(key));
-                sb.append("  "+key+"="+bundle.get(key)+"\n");
-            }
-
-            sb.append("}\n");
-
-            tv_log.setText(sb.toString() + tv_log.getText());
+            tv_log.setText(BundleHelper.toString(bundle) + tv_log.getText());
         }
     }
 
@@ -179,9 +175,6 @@ public class MainActivity extends Activity {
         // 註銷接收廣播服務
         this.unregisterReceiver(myReceiver);
     }
-
-
-
 
 
 }
