@@ -11,9 +11,12 @@ And then create a server key, so you have two data.
 
 ##Client
 The Android App can help you direct get push token.
+
 1. put sender ID in editText
 2. click `取得tokeb` button, and then token will show in the screen
 3. click `mail` button send to your email
+
+![Alt text](resources/gcmtool.png)
 
 ##Server
 Use [PostMan](https://www.getpostman.com/) and import `gcm-push.json.postman_coll`. [Download here](https://drive.google.com/file/d/0B4lG-zFPhFZ0dzZOZkduRG1Ccnc/view?usp=sharing)
