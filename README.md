@@ -19,7 +19,7 @@ The Android App can help you direct get push token.
 ![Alt text](resources/gcmtool.png)
 
 ##Server
-Use [PostMan](https://www.getpostman.com/) and import `gcm-push.json.postman_coll`. [Download here](https://drive.google.com/file/d/0B4lG-zFPhFZ0dzZOZkduRG1Ccnc/view?usp=sharing)
+Use [PostMan](https://www.getpostman.com/) and import `gcm-push.json.postman_coll`. [Download here](https://drive.google.com/file/d/0B4lG-zFPhFZ0bG5tTE0ycXItRzg/view?usp=sharing)
 
 
 ######HTTP HEAD
