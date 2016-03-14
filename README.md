@@ -1,6 +1,7 @@
 ##GCM Sample Client and Server
 
 sample code for [Google Cloud Messaging](https://developers.google.com/cloud-messaging/) for Android. The client is an Android app and the server is a [PostMan](https://www.getpostman.com/) Tool
+![Alt text](resources/gcm-flow.jpg)
 
 ##Setup Google Cloud Messaging
 At first, you need go to [google developer console](https://console.developers.google.com) setup a project and enable Google Cloud Messaging API.
